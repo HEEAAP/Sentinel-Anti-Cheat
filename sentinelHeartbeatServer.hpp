@@ -1,4 +1,4 @@
-//Inter process communication using windows named pipes, prevents cheaters from simply freezing, suspending or killing sentinel
+//Inter Process Communication (IPC) using windows named pipes, prevents cheaters from simply freezing, suspending or killing sentinel
 #pragma once
 #include <Windows.h>
 #include <iostream>
