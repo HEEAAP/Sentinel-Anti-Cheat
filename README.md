@@ -52,7 +52,7 @@ Sentinel employs a multi-layered defense model covering process initialization, 
                       |          TARGETAPP.EXE           |
                       |   (Client Self-Termination)      |
                       +----------------------------------+
-
+```
 ---
 
 ## 🛠️ Build Requirements
