@@ -129,8 +129,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="debuggerDetector.hpp" />
+    <ClInclude Include="sentinelHeartbeatServer.hpp" />
+    <ClInclude Include="moduleScanner.hpp" />
     <ClInclude Include="processLauncher.hpp" />
+    <ClInclude Include="protectProcess.hpp" />
     <ClInclude Include="sentinelSplash.hpp" />
+    <ClInclude Include="signatureVerifier.hpp" />
     <ClInclude Include="threatResponder.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

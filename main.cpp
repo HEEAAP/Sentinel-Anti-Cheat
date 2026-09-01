@@ -10,12 +10,15 @@
 #include "threatResponder.hpp"
 #include "processLauncher.hpp"
 #include "sentinelSplash.hpp"
+#include "moduleScanner.hpp"
+#include "sentinelHeartbeatServer.hpp"
+#include "protectProcess.hpp"
 
 //Console output text colours
-#define GREEN  "\x1B[32m"
-#define RED    "\x1B[31m"
-#define MAGENTA "\x1B[35m"
-#define RESET  "\x1B[0m"
+constexpr const char* GREEN		= "\x1B[32m";
+constexpr const char* RED		= "\x1B[31m";
+constexpr const char* MAGENTA	= "\x1B[35m";
+constexpr const char* RESET		= "\x1B[0m";
 
 template <typename T>
 [[nodiscard]] auto ReadMemory(HANDLE process_handle, const void* target_address) -> std::optional<T> {
@@ -29,7 +32,16 @@ template <typename T>
 }
 
 int main() {
-	//ShowWindow(GetConsoleWindow(), SW_HIDE);
+	if (!Sentinel::Security::enableProcessProtection) {
+		std::cout << MAGENTA << "[SENTINEL]" << RED << " Error: Failed to apply process ACL protection.\n" << RESET;
+	}
+
+	Sentinel::Security::HeartbeatServer heartbeat;
+	if (!heartbeat.start()) {
+		std::cout << MAGENTA << "[SENTINEL]" << RED << " Error: Failed to initialize Heartbeat IPC server.\n" << RESET;
+		return 1;
+	}
+
 	Sentinel::UI::SplashWindow splash;
 	splash.showAsync(L"Sentinel Engine", L"Bootstrapping target process...");
 
@@ -80,6 +92,8 @@ int main() {
 	constexpr auto active_policy{ Sentinel::Security::ResponsePolicy::TerminateTarget }; //LogsOnly, SuspendTarget, TerminateTarget
 
 	std::cout << MAGENTA << "[SENTINEL]" << GREEN << " Monitoring Target Process " << RESET << "(PID " << pid << ")...\n";
+	
+	std::wstring untrusted_module_name;
 
 	//Security scan loop
 	while (true) {
@@ -98,10 +112,19 @@ int main() {
 			break;
 		}
 
+		if (Sentinel::Security::hasUnauthorizedModules(pid, untrusted_module_name)) {
+			std::string reason("Unauthorized DLL Module Detected: " + std::string(untrusted_module_name.begin(), untrusted_module_name.end()));
+			Sentinel::Security::enforcePolicy(process_handle, pid, active_policy, reason.c_str());
+			break;
+		}
+
 		std::this_thread::sleep_for(std::chrono::seconds(2));
 	}
 
+	heartbeat.stop();
 	CloseHandle(process_handle);
-	std::cout << MAGENTA << "\n[SENTINEL] Session Closed. Press Enter to exit..";
+
+	std::cout << MAGENTA << "\n[SENTINEL] Session Closed. Press Enter to exit.." << RESET;
 	std::cin.get();
+	return 0;
 }

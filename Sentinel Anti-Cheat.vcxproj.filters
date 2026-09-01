@@ -32,5 +32,17 @@
     <ClInclude Include="sentinelSplash.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="moduleScanner.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="signatureVerifier.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="protectProcess.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sentinelHeartbeatServer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
