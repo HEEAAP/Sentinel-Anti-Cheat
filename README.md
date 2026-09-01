@@ -31,25 +31,27 @@ Sentinel employs a multi-layered defense model covering process initialization, 
 ---
 
 ## 📐 System Architecture
-+---------------------------------------------------------------------+
-**                  |           SENTINEL.EXE           |
-**                  |    (Anti-Cheat Security Daemon)   |
-**                  +-----------------+----------------+
-**                                    |
-**  +---------------------------------+---------------------------------+
-**  |                                 |                                 |
-**  v                                 v                                 v
-**[Initialization & UI]         [IPC Heartbeat Server]       [Active Protection Loops]
-**├── Process ACL Stripping     └── Named Pipe Server        ├── PEB Debugger Detector
-**├── TaskDialogIndirect Splash      (Tokens via IPC)        ├── DR0-DR3 Reg Scanner
-**└── Suspended Process Spawn                                ├── 0xCC .text Patch Scan
-**└── WinVerifyTrust DLL Scan
-**|
-**v
-**+----------------------------------+
-**|          TARGETAPP.EXE           |
-**|   (Client Self-Termination)      |
-**+----------------------------------+
+
+```text
+                      +----------------------------------+
+                      |           SENTINEL.EXE           |
+                      |    (Anti-Cheat Security Daemon)   |
+                      +-----------------+----------------+
+                                        |
+      +---------------------------------+---------------------------------+
+      |                                 |                                 |
+      v                                 v                                 v
+[Initialization & UI]         [IPC Heartbeat Server]       [Active Protection Loops]
+ ├── Process ACL Stripping     └── Named Pipe Server        ├── PEB Debugger Detector
+ ├── TaskDialogIndirect Splash      (Tokens via IPC)        ├── DR0-DR3 Reg Scanner
+ └── Suspended Process Spawn                                ├── 0xCC .text Patch Scan
+                                                            └── WinVerifyTrust DLL Scan
+                                        |
+                                        v
+                      +----------------------------------+
+                      |          TARGETAPP.EXE           |
+                      |   (Client Self-Termination)      |
+                      +----------------------------------+
 
 ---
 
