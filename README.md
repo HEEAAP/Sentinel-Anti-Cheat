@@ -20,11 +20,16 @@ Sentinel employs a multi-layered defense model covering process initialization, 
 * **Path Filtering:** Validates loaded dynamic libraries against standard OS directories (`System32`, `SysWOW64`, `WinSxS`) and the application's root execution folder.
 * **Authenticode Signature Verification (`WinVerifyTrust`):** Any external DLL loaded outside standard system folders is parsed via `wintrust.dll` to verify its PKCS #7 digital signature against trusted root certificate authorities.
 
-### 4. Code & Memory Integrity Monitoring
-* **Software Breakpoint Detection (`0xCC` / `INT 3` Scanning):** Reads and parses the target's `.text` code section in memory to catch inline software breakpoints, function hooks, or injected `INT 3` instruction modifications.
+### 4. Window & Class Name Blacklist Scanner
+* **Enumeration Guard:** Periodically sweeps all active desktop windows (`EnumWindows`) to flag hidden or running cheat tools.
+* **Title & Class Matching:** Matches window titles and underlying window classes (e.g., Cheat Engine, x64dbg, Process Hacker, ReClass, System Informer) case-insensitively, bypassing obfuscated or renamed executable titles.
+
+### 5. Code & Memory Integrity Monitoring
+* **Software Breakpoint Detection (`0xCC` / `INT 3` Scanning):** Reads and parses the target's `.text` code section in memory to catch inline software breakpoints, function hooks, or injected `INT 3` instruction modifications while skipping MSVC alignment padding.
+* **In-Memory Code Section Hashing (FNV-1a Checksum):** Captures a pristine baseline hash of the `.text` section right after process resumption and continuously validates live memory against it to catch byte-patching and memory tampering instantly.
 * **Configurable Threat Response Policy:** Supports dynamic policy actions upon threat detection (`LogsOnly`, `SuspendTarget`, or `TerminateTarget`).
 
-### 5. Inter-Process Communication (IPC) Heartbeat
+### 6. Inter-Process Communication (IPC) Heartbeat
 * **Bidirectional Named Pipe Heartbeat:** Establishes a local duplex Named Pipe (`\\.\pipe\SentinelHeartbeatPipe`) between `Sentinel.exe` (Server) and `TargetApp.exe` (Client).
 * **Self-Termination Safeguard:** Sentinel transmits cyclic cryptographic sequence tokens every 500ms. If `Sentinel.exe` is frozen, suspended, or forcefully closed, `TargetApp.exe` fails pipe verification and automatically invokes `ExitProcess(0)` within ~400ms.
 
