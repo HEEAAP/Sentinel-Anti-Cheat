@@ -13,6 +13,8 @@
 #include "moduleScanner.hpp"
 #include "sentinelHeartbeatServer.hpp"
 #include "protectProcess.hpp"
+#include "windowScanner.hpp"
+#include "codeHasher.hpp"
 
 //Console output text colours
 constexpr const char* GREEN		= "\x1B[32m";
@@ -83,6 +85,12 @@ int main() {
 	Sentinel::Launcher::resumeTargetProcess(thread_handle);
 	CloseHandle(thread_handle);
 
+	//Capture code section hash baseline
+	const ULONG64 baseline_text_hash{ Sentinel::Security::CodeHasher::calculateTextSectionHash(process_handle, base_address) };
+	if (baseline_text_hash == 0) {
+		std::cout << MAGENTA << "[SENTINEL]" << RED << "Warning: Failed ot generate initial .text section baseline hash.\n";
+	}
+
 	splash.updateStatus(L"Protection ACTIVE. Enjoy your game!");
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 
@@ -94,6 +102,7 @@ int main() {
 	std::cout << MAGENTA << "[SENTINEL]" << GREEN << " Monitoring Target Process " << RESET << "(PID " << pid << ")...\n";
 	
 	std::wstring untrusted_module_name;
+	std::wstring detected_window;
 
 	//Security scan loop
 	while (true) {
@@ -116,6 +125,20 @@ int main() {
 			std::string reason("Unauthorized DLL Module Detected: " + std::string(untrusted_module_name.begin(), untrusted_module_name.end()));
 			Sentinel::Security::enforcePolicy(process_handle, pid, active_policy, reason.c_str());
 			break;
+		}
+
+		if (Sentinel::Security::WindowScanner::hasBlacklistedWindow(detected_window)) {
+			std::string reason("Blacklisted Window/Tool Detected: " + std::string(detected_window.begin(), detected_window.end()));
+			Sentinel::Security::enforcePolicy(process_handle, pid, active_policy, reason.c_str());
+			break;
+		}
+
+		if (baseline_text_hash != 0) {
+			const ULONG64 current_text_hash{ Sentinel::Security::CodeHasher::calculateTextSectionHash(process_handle, base_address) };
+			if (current_text_hash != baseline_text_hash) {
+				Sentinel::Security::enforcePolicy(process_handle, pid, active_policy, "Code Integrity Violation (memory byte modification)");
+				break;
+			}
 		}
 
 		std::this_thread::sleep_for(std::chrono::seconds(2));

@@ -44,5 +44,11 @@
     <ClInclude Include="sentinelHeartbeatServer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="windowScanner.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="codeHasher.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

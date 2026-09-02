@@ -118,16 +118,19 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="codeHasher.hpp" />
     <ClInclude Include="debuggerDetector.hpp" />
     <ClInclude Include="sentinelHeartbeatServer.hpp" />
     <ClInclude Include="moduleScanner.hpp" />
@@ -136,6 +139,7 @@
     <ClInclude Include="sentinelSplash.hpp" />
     <ClInclude Include="signatureVerifier.hpp" />
     <ClInclude Include="threatResponder.hpp" />
+    <ClInclude Include="windowScanner.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
